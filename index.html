@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>機率論核心概念與分佈入門 - 教學簡報</title>
+    <!-- 引入 MathJax 渲染數學公式 -->
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$']] }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --primary: #2563eb;
+            --secondary: #475569;
+            --accent: #0f172a;
+            --highlight-bg: #eff6ff;
+            --border-color: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--accent);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .slide-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .slide {
+            display: none;
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 960px;
+            min-height: 540px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+            padding: 3rem 3.5rem;
+            flex-direction: column;
+            justify-content: space-between;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .slide.active { display: flex; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .tag {
+            display: inline-block;
+            background: var(--highlight-bg);
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.85rem;
+            padding: 0.35rem 0.85rem;
+            border-radius: 999px;
+            margin-bottom: 1rem;
+        }
+        h1 { font-size: 2.4rem; line-height: 1.3; color: var(--accent); margin-bottom: 1rem; }
+        h2 { font-size: 1.75rem; color: var(--accent); margin-bottom: 1.25rem; border-bottom: 2px solid var(--highlight-bg); padding-bottom: 0.5rem; }
+        p, li { font-size: 1.1rem; line-height: 1.7; color: var(--secondary); margin-bottom: 0.75rem; }
+        ul { padding-left: 1.5rem; }
+        .box {
+            background: var(--highlight-bg);
+            border-left: 4px solid var(--primary);
+            padding: 1rem 1.25rem;
+            border-radius: 0 8px 8px 0;
+            margin: 1rem 0;
+        }
+        .box strong { color: var(--primary); }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 0.5rem;
+        }
+        .card {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 1.25rem;
+            background: #fdfdfd;
+        }
+        .card h3 { font-size: 1.2rem; color: var(--primary); margin-bottom: 0.5rem; }
+        .wiki-ref {
+            font-size: 0.85rem;
+            color: #64748b;
+            border-top: 1px dashed var(--border-color);
+            padding-top: 0.75rem;
+            margin-top: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+        }
+        .controls {
+            background: var(--card-bg);
+            border-top: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.25rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        button:hover { background: #1d4ed8; }
+        button:disabled { background: #cbd5e1; cursor: not-allowed; }
+        .progress { font-size: 0.95rem; color: var(--secondary); font-weight: 600; }
+    </style>
+</head>
+<body>
+
+<div class="slide-container">
+    <!-- Slide 1: 封面 -->
+    <div class="slide active">
+        <div>
+            <span class="tag">機率論零基礎互動教學</span>
+            <h1>從直覺到數學模型：<br>條件機率、PDF/CDF 與多項分佈</h1>
+            <p style="font-size: 1.25rem; margin-top: 1rem;">不用死背公式，用生活直覺與幾何面積一次打通機率論核心架構。</p>
+            <div class="box" style="margin-top: 2rem;">
+                <strong>本簡報學習地圖：</strong><br>
+                1. 縮小樣本空間的藝術（條件機率與貝氏陷阱）<br>
+                2. 離散點數 vs. 連續面積（PMF、PDF 與 CDF）<br>
+                3. 從丟硬幣到擲多面骰（二項分佈與多項分佈）
+            </div>
+        </div>
+        <div class="wiki-ref">
+            <span>知識庫來源：機率論 LLM Wiki (統整台大、中山講義與維基百科)</span>
+            <span>使用鍵盤 ← → 鍵切換投影片</span>
+        </div>
+    </div>
+
+    <!-- Slide 2: 基礎公理與條件機率 -->
+    <div class="slide">
+        <div>
+            <span class="tag">單元一：條件機率與事件關係</span>
+            <h2>條件機率 $P(A|B)$：把世界縮小來看</h2>
+            <p>條件機率的本質，就是<strong>「在已知事件 $B$ 發生的前提下，把原本的樣本空間 $S$ 縮小成 $B$」</strong>，再看 $A$ 佔了多少比例：</p>
+            <div class="box">
+                $$P(A|B) = \frac{P(A \cap B)}{P(B)} \quad (\text{前提：} P(B) > 0)$$
+            </div>
+            <div class="grid-2">
+                <div class="card">
+                    <h3>統計獨立（Independent）</h3>
+                    <p>$B$ 發生與否，完全不影響 $A$ 的機率。<br>$P(A \cap B) = P(A)P(B)$，即 $P(A|B) = P(A)$。<br><em>例：連擲兩次硬幣，第一次正面不影響第二次。</em></p>
+                </div>
+                <div class="card">
+                    <h3>互斥事件（Mutually Exclusive）</h3>
+                    <p>兩者絕不可能同時發生，$P(A \cap B) = 0$。<br>只要 $B$ 發生，$A$ 機率立刻歸零：$P(A|B) = 0$。<br><strong>注意：正機率的互斥事件必定「不獨立」！</strong></p>
+                </div>
+            </div>
+        </div>
+        <div class="wiki-ref">
+            <span>對應 Wiki 章節：01-foundations-and-conditional.md</span>
+            <span>引用資料：[資料 1]、[資料 2]</span>
+        </div>
+    </div>
+
+    <!-- Slide 3: 貝氏定理與假陽性陷阱 -->
+    <div class="slide">
+        <div>
+            <span class="tag">單元二：貝氏定理與直覺反差</span>
+            <h2>為什麼檢測準確率 99%，陽性卻只有一半真生病？</h2>
+            <p>貝氏定理告訴我們如何用「新證據」更新「事前認知」：$P(B|A) = \frac{P(A|B)P(B)}{P(A)}$。</p>
+            <div class="box">
+                <strong>經典醫療檢測陷阱（基礎率謬誤 Base Rate Fallacy）：</strong><br>
+                假設某罕見疾病盛行率 $P(\text{患病}) = 1\%$，檢測準確率 $99\%$（偽陽性率 $P(\text{陽性}|\text{健康}) = 1\%$）。
+            </div>
+            <ul>
+                <li><strong>真陽性比例：</strong>$1\% \times 99\% = 0.99\%$（真的生病且測出陽性）</li>
+                <li><strong>假陽性比例：</strong>$99\% \times 1\% = 0.99\%$（健康的人龐大，誤判人數一樣多！）</li>
+                <li><strong>實際患病機率：</strong>$P(\text{患病}|\text{陽性}) = \frac{0.99\%}{0.99\% + 0.99\%} = \mathbf{50\%}$</li>
+            </ul>
+            <p><strong>關鍵觀念：</strong>千萬別把 $P(\text{陽性}|\text{患病})$ 跟 $P(\text{患病}|\text{陽性})$ 畫上等號！</p>
+        </div>
+        <div class="wiki-ref">
+            <span>對應 Wiki 章節：02-bayes-theorem-and-traps.md</span>
+            <span>引用資料：[資料 2]</span>
+        </div>
+    </div>
+
+    <!-- Slide 4: PDF 與 CDF -->
+    <div class="slide">
+        <div>
+            <span class="tag">單元三：隨機變數的描述工具</span>
+            <h2>PDF（密度）與 CDF（累積）：高度 vs. 面積</h2>
+            <div class="grid-2">
+                <div class="card">
+                    <h3>機率密度函數 PDF $f_X(x)$</h3>
+                    <p>用於<strong>連續型</strong>隨機變數。單點機率永遠為 $0$（$P(X=a)=0$），必須靠<strong>積分求面積</strong>：</p>
+                    <p>$$P(a < X \le b) = \int_a^b f_X(x)\,dx$$</p>
+                    <p>滿足 $f_X(x) \ge 0$ 且總面積 $\int_{-\infty}^\infty f_X(x)\,dx = 1$。</p>
+                </div>
+                <div class="card">
+                    <h3>累積分佈函數 CDF $F_X(x)$</h3>
+                    <p>代表「一路累加到 $x$ 為止的總機率」：$F_X(x) = P(X \le x)$。</p>
+                    <ul>
+                        <li>離散變數：呈現<strong>階梯狀遞增</strong></li>
+                        <li>連續變數：呈現<strong>平滑曲線遞增</strong>，且微積分互為反運算：$F'_X(x) = f_X(x)$</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="wiki-ref">
+            <span>對應 Wiki 章節：03-random-variables-pdf-cdf.md</span>
+            <span>引用資料：[資料 3]、[資料 4]</span>
+        </div>
+    </div>
+
+    <!-- Slide 5: 二項分佈 Binomial -->
+    <div class="slide">
+        <div>
+            <span class="tag">單元四：離散分佈核心（二選一）</span>
+            <h2>二項分佈 Binomial $X \sim B(n, p)$</h2>
+            <p>將只有「成功（機率 $p$）」與「失敗（機率 $1-p$）」的獨立伯努利試驗重複做 $n$ 次，計算<strong>總成功次數 $k$</strong> 的機率分佈：</p>
+            <div class="box">
+                $$P(X = k) = \binom{n}{k} p^k (1-p)^{n-k}, \quad k = 0, 1, \dots, n$$
+            </div>
+            <ul>
+                <li><strong>公式拆解：</strong>從 $n$ 次中挑出 $k$ 次成功的方法數 $\binom{n}{k}$，乘上 $k$ 次成功與 $n-k$ 次失敗的機率。</li>
+                <li><strong>核心指標：</strong>期望值 $E[X] = np$，變異數 $\text{Var}(X) = np(1-p)$。</li>
+                <li><strong>大樣本近似：</strong>當 $n$ 很大時，圖形會趨近於鐘形的<strong>常態分佈</strong> $N(np, np(1-p))$。</li>
+            </ul>
+        </div>
+        <div class="wiki-ref">
+            <span>對應 Wiki 章節：04-binomial-distribution.md</span>
+            <span>引用資料：[資料 5]</span>
+        </div>
+    </div>
+
+    <!-- Slide 6: 多項分佈 Multinomial -->
+    <div class="slide">
+        <div>
+            <span class="tag">單元五：離散分佈推廣（多選一）</span>
+            <h2>多項分佈 Multinomial：當結果不只兩種</h2>
+            <p>二項分佈是「丟硬幣（2面）」，多項分佈就是<strong>「擲一顆 $k$ 面骰子 $n$ 次」</strong>。每次試驗有 $k$ 種互斥結果（機率 $p_1, \dots, p_k$，總和為 $1$）：</p>
+            <div class="box">
+                $$P(X_1 = x_1, \dots, X_k = x_k) = \frac{n!}{x_1! x_2! \cdots x_k!} p_1^{x_1} p_2^{x_2} \cdots p_k^{x_k} \quad (\sum x_i = n)$$
+            </div>
+            <ul>
+                <li><strong>生活實例：</strong>三方選戰（支持率 20%, 30%, 50%）隨機抽 6 位選民，恰為 1、2、3 人的機率為 $\frac{6!}{1!2!3!}(0.2)^1(0.3)^2(0.5)^3 = 13.5\%$。</li>
+                <li><strong>負共變異數性質：</strong>因為總次數 $n$ 固定，某一類次數變多，另一類必然減少，故 $\text{Cov}(X_i, X_j) = -n p_i p_j < 0$。</li>
+            </ul>
+        </div>
+        <div class="wiki-ref">
+            <span>對應 Wiki 章節：05-multinomial-distribution.md</span>
+            <span>引用資料：[資料 6]</span>
+        </div>
+    </div>
+</div>
+
+<div class="controls">
+    <button id="prevBtn" onclick="changeSlide(-1)" disabled>← 上一頁</button>
+    <span class="progress" id="progressText">第 1 頁 / 共 6 頁</span>
+    <button id="nextBtn" onclick="changeSlide(1)">下一頁 →</button>
+</div>
+
+<script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const progressText = document.getElementById('progressText');
+
+    function updateSlide() {
+        slides.forEach((s, idx) => {
+            s.classList.toggle('active', idx === currentSlide);
+        });
+        prevBtn.disabled = currentSlide === 0;
+        nextBtn.disabled = currentSlide === slides.length - 1;
+        progressText.textContent = `第 ${currentSlide + 1} 頁 / 共 ${slides.length} 頁`;
+    }
+
+    function changeSlide(dir) {
+        currentSlide = Math.min(Math.max(currentSlide + dir, 0), slides.length - 1);
+        updateSlide();
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ') changeSlide(1);
+        if (e.key === 'ArrowLeft') changeSlide(-1);
+    });
+</script>
+</body>
+</html>
